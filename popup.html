@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: sans-serif; width: 200px; padding: 10px; }
+    input[type=range] { width: 100%; }
+  </style>
+</head>
+<body>
+  <label>
+    <input type="checkbox" id="toggleBlur" /> Enable Blur
+  </label>
+  <br><br>
+  <label>
+    Blur Amount: <span id="blurValue">0%</span>
+    <input type="range" id="blurRange" min="0" max="100" value="0">
+  </label>
+  <script src="popup.js"></script>
+</body>
+</html>
