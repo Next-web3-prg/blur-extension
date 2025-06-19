@@ -1,3 +1,5 @@
+// popup.js
+// Handles popup UI for toggling blur and adjusting blur amount
 const toggle = document.getElementById('toggleBlur');
 const range = document.getElementById('blurRange');
 const blurValue = document.getElementById('blurValue');
@@ -19,7 +21,7 @@ function sendUpdate() {
   });
 }
 
-
+// Initialize popup state
 chrome.storage.sync.get(['enabled', 'blur'], ({enabled = false, blur = 0}) => {
   toggle.checked = enabled;
   range.value = blur;
@@ -44,6 +46,7 @@ range.addEventListener('input', () => {
   }, 100);
 });
 
+// Optional: Keyboard shortcut for popup UI (does not affect global hotkey)
 window.addEventListener('keydown', (e) => {
   if (e.altKey && e.key.toLowerCase() === 'l') {
     toggle.checked = !toggle.checked;
