@@ -44,11 +44,3 @@ range.addEventListener("input", () => {
     blurSaveTimeout = null;
   }, 100);
 });
-
-// Optional: Keyboard shortcut for popup UI (does not affect global hotkey)
-window.addEventListener("keydown", (e) => {
-  if (e.altKey && e.key.toLowerCase() === "l") {
-    toggle.checked = !toggle.checked;
-    chrome.storage.sync.set({ enabled: toggle.checked }, sendUpdate);
-  }
-});

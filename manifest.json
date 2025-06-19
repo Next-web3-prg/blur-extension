@@ -27,13 +27,5 @@
       ],
       "run_at": "document_idle"
     }
-  ],
-  "commands": {
-    "toggle-blur": {
-      "suggested_key": {
-        "default": "Alt+L"
-      },
-      "description": "Toggle image blur"
-    }
-  }
+  ]
 }
