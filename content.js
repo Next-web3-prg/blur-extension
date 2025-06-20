@@ -38,12 +38,13 @@ function setBlurAll(enabled, amount) {
   document.querySelectorAll("img, video, canvas").forEach((el) => {
     el.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
   });
-  document.querySelectorAll("div, span").forEach((div) => {
-    const bg = window.getComputedStyle(div).backgroundImage;
-    if (bg && bg !== "none") {
-      div.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
+  document.querySelectorAll("div, span").forEach((el) => {
+    const bg = window.getComputedStyle(el).backgroundImage;
+    // Only blur if backgroundImage is a url (not none, not gradient)
+    if (bg && bg.startsWith("url(")) {
+      el.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
     } else if (!enabled) {
-      div.style.filter = "";
+      el.style.filter = "";
     }
   });
 }
