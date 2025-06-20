@@ -28,7 +28,24 @@ chrome.storage.sync.get(
 );
 
 toggle.addEventListener("change", () => {
-  chrome.storage.sync.set({ enabled: toggle.checked }, sendUpdate);
+  chrome.storage.sync.set({ enabled: toggle.checked }, () => {
+    sendUpdate();
+    chrome.action.setIcon({
+      path: toggle.checked
+        ? {
+          "16": "icons/enabled-16.png",
+          "32": "icons/enabled-32.png",
+          "48": "icons/enabled-48.png",
+          "128": "icons/enabled-128.png",
+        }
+        : {
+          "16": "icons/disabled-16.png",
+          "32": "icons/disabled-32.png",
+          "48": "icons/disabled-48.png",
+          "128": "icons/disabled-128.png",
+        },
+    });
+  });
 });
 
 let blurSaveTimeout = null;
