@@ -38,11 +38,12 @@ document.addEventListener("keydown", (e) => {
   // Toggle blur on hovered element
   if (e.altKey && e.key.toLowerCase() === "k" && hoveredElement) {
     const isImg = hoveredElement.tagName === "IMG";
+    const isCanvas = hoveredElement.tagName === "CANVAS";
     const isVideo = hoveredElement.tagName === "VIDEO";
     const isDivWithBg =
       hoveredElement.tagName === "DIV" &&
       window.getComputedStyle(hoveredElement).backgroundImage !== "none";
-    if (isImg || isVideo || isDivWithBg) {
+    if (isImg || isVideo || isDivWithBg || isCanvas) {
       if (blurReleasedElements.has(hoveredElement)) {
         // Re-apply blur
         chrome.storage.sync.get(["enabled", "blur"], ({ enabled, blur }) => {
@@ -76,6 +77,12 @@ function setImageBlur(enabled, amount) {
       video.style.filter = enabled ? `blur(${amount}px)` : "";
     }
   });
+  const canvases = document.querySelectorAll("canvas");
+  canvases.forEach((canvas) => {
+    if (!blurReleasedElements.has(canvas)) {
+      canvas.style.filter = enabled ? `blur(${amount}px)` : "";
+    }
+  });
   const divs = document.querySelectorAll("div");
   divs.forEach((div) => {
     const bg = window.getComputedStyle(div).backgroundImage;
@@ -96,16 +103,22 @@ chrome.runtime.onMessage.addListener((msg) => {
   }
 });
 
-chrome.storage.sync.get(["enabled", "blur"], ({ enabled = false, blur = 0 }) => {
-  const blurAmount = (blur / 10).toFixed(1);
-  setImageBlur(enabled, blurAmount);
-});
-
-const observer = new MutationObserver(() => {
-  chrome.storage.sync.get(["enabled", "blur"], ({ enabled = false, blur = 0 }) => {
+chrome.storage.sync.get(
+  ["enabled", "blur"],
+  ({ enabled = false, blur = 0 }) => {
     const blurAmount = (blur / 10).toFixed(1);
     setImageBlur(enabled, blurAmount);
-  });
+  }
+);
+
+const observer = new MutationObserver(() => {
+  chrome.storage.sync.get(
+    ["enabled", "blur"],
+    ({ enabled = false, blur = 0 }) => {
+      const blurAmount = (blur / 10).toFixed(1);
+      setImageBlur(enabled, blurAmount);
+    }
+  );
 });
 observer.observe(document.body, {
   childList: true,
