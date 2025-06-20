@@ -6,17 +6,32 @@ const maxBlur = 50; // Maximum blur amount
 // Main keydown handler for global blur toggle and blur amount adjustment
 // Alt+L: toggle blur, Alt+[ / Alt+]: decrease/increase blur
 
+document.addEventListener("DOMContentLoaded", () => {
+  // Set initial icon based on storage state
+  chrome.storage.sync.get(["enabled", "blur"], ({ enabled, blur }) => {
+    chrome.runtime.sendMessage({
+      action: "setIcon",
+      enabled: enabled,
+    });
+  });
+});
+
 document.addEventListener("keydown", (e) => {
   const now = Date.now();
   if (now - lastKeyTime < 100) return;
   lastKeyTime = now;
 
   // Global blur toggle
-  if (e.altKey && (e.key === 0x4C || e.key === 0x6C)) {
+  if (e.altKey && (e.key === "l" || e.key == "L")) {
     chrome.storage.sync.get(["enabled", "blur"], ({ enabled, blur }) => {
       const newState = !enabled;
-      chrome.storage.sync.set({ enabled: newState });
-      setBlurAll(newState, blur);
+      chrome.storage.sync.set({ enabled: newState }, () => {
+        setBlurAll(newState, blur);
+        chrome.runtime.sendMessage({
+          action: "setIcon",
+          enabled: newState,
+        });
+      });
     });
   }
 
@@ -24,7 +39,7 @@ document.addEventListener("keydown", (e) => {
   if (e.altKey && (e.key === "[" || e.key === "]")) {
     chrome.storage.sync.get(["enabled", "blur"], ({ enabled, blur }) => {
       let newBlur = blur;
-      if (e.key === "]" && blur < 100){
+      if (e.key === "]" && blur < 100) {
         if (newBlur === 0) newBlur = 1; // Start from 1 if currently 0
         if (newBlur >= 100) return; // Don't exceed max blur
         if (newBlur < 5) newBlur += 1; // Avoid too small increments
@@ -32,7 +47,7 @@ document.addEventListener("keydown", (e) => {
         else if (newBlur < 50) newBlur += Math.ceil(newBlur / 5);
         else if (newBlur < 100) newBlur += Math.ceil(newBlur / 2);
       }
-      if (e.key === "[" && blur > 1){
+      if (e.key === "[" && blur > 1) {
         if (newBlur <= 1) return; // Don't go below 1
         if (newBlur <= 5) newBlur -= 1; // Avoid too small decrements
         else if (newBlur <= 20) newBlur -= Math.ceil(newBlur / 10);
