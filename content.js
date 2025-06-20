@@ -38,7 +38,7 @@ function setBlurAll(enabled, amount) {
   document.querySelectorAll("img, video, canvas").forEach((el) => {
     el.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
   });
-  document.querySelectorAll("div, span").forEach((div) => {
+  document.querySelectorAll("div, span, svg").forEach((div) => {
     const bg = window.getComputedStyle(div).backgroundImage;
     if (bg && bg !== "none") {
       div.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
