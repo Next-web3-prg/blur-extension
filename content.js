@@ -105,9 +105,12 @@ chrome.storage.sync.get(
 // Observe DOM changes and re-apply blur for SPA and dynamic content
 const observer = new MutationObserver(() => {
   chrome.storage.sync.get(
-    ["enabled", "blur"],
-    ({ enabled = false, blur = 0 }) => {
-      setBlurAll(enabled, blur);
+    ["enabled", "blur", "whitelist"],
+    ({ enabled = false, blur = 0, whitelist = [] }) => {
+      let host = '';
+      try { host = window.location.hostname; } catch (e) {}
+      const isWhitelisted = Array.isArray(whitelist) && (whitelist.includes(host) || whitelist.some(site => host.endsWith('.' + site)));
+      setBlurAll(enabled && !isWhitelisted, blur);
     }
   );
 });
