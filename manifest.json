@@ -14,9 +14,6 @@
       "16": "icon.png"
     }
   },
-  "background": {
-    "service_worker": "background.js"
-  },
   "content_scripts": [
     {
       "matches": [
