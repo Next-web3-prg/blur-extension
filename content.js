@@ -35,18 +35,52 @@ document.addEventListener("keydown", (e) => {
 
 // Blur/unblur all supported elements
 function setBlurAll(enabled, amount) {
-  document.querySelectorAll("img, video, canvas, svg").forEach((el) => {
-    el.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
-  });
-  document.querySelectorAll("div, span").forEach((el) => {
-    const bg = window.getComputedStyle(el).backgroundImage;
-    // Only blur if backgroundImage is a url (not none, not gradient)
-    if (bg && bg.startsWith("url(")) {
-      el.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
-    } else if (!enabled) {
-      el.style.filter = "";
+  chrome.storage.sync.get(
+    ["blurVideo", "blurCanvas", "blurBgImage"],
+    ({ blurVideo = true, blurCanvas = true, blurBgImage = true }) => {
+      document.querySelectorAll("img").forEach((el) => {
+        el.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
+      });
+      if (blurVideo && enabled) {
+        document.querySelectorAll("video").forEach((el) => {
+          el.style.filter = enabled
+            ? `blur(${(amount * maxBlur) / 100}px)`
+            : "";
+        });
+      } else {
+        document.querySelectorAll("video").forEach((el) => {
+          el.style.filter = "";
+        });
+      }
+      if (blurCanvas && enabled) {
+        document.querySelectorAll("canvas, svg").forEach((el) => {
+          el.style.filter = enabled
+            ? `blur(${(amount * maxBlur) / 100}px)`
+            : "";
+        });
+      } else {
+        document.querySelectorAll("canvas, svg").forEach((el) => {
+          el.style.filter = "";
+        });
+      }
+      if (blurBgImage) {
+        document.querySelectorAll("div, span").forEach((el) => {
+          const bg = window.getComputedStyle(el).backgroundImage;
+          if (bg && bg.startsWith("url(")) {
+            el.style.filter = enabled
+              ? `blur(${(amount * maxBlur) / 100}px)`
+              : "";
+          } else if (!enabled) {
+            el.style.filter = "";
+          }
+        });
+      } else if (!enabled) {
+        document.querySelectorAll("div, span").forEach((el) => {
+          el.style.filter = "";
+        });
+      }
     }
-  });
+  );
 }
 
 // Listen for messages from the background script
