@@ -79,6 +79,10 @@ function setBlurAll(enabled, amount) {
           el.style.filter = "";
         });
       }
+      // Blur <object> tags with type starting with "image"
+      document.querySelectorAll("object[type^='image']").forEach((el) => {
+        el.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
+      });
     }
   );
 }
