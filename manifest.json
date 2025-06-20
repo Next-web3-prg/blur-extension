@@ -11,7 +11,10 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icon_b.png"
+      "16": "icons/disabled-16.png",
+      "32": "icons/disabled-32.png",
+      "48": "icons/disabled-48.png",
+      "128": "icons/disabled-128.png"
     }
   },
   "content_scripts": [
