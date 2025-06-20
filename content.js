@@ -24,7 +24,8 @@ document.addEventListener("keydown", (e) => {
   if (e.altKey && (e.key === "[" || e.key === "]")) {
     chrome.storage.sync.get(["enabled", "blur"], ({ enabled, blur }) => {
       let newBlur = blur;
-      if (e.key === "]" && blur < 100) newBlur += Math.ceil(newBlur / 5);
+      if (e.key === "]" && blur < 100)
+        newBlur += Math.max(Math.ceil(newBlur / 5), 1);
       if (e.key === "[" && blur > 0) newBlur -= Math.ceil(newBlur / 5);
       chrome.storage.sync.set({ blur: newBlur });
       setBlurAll(enabled, newBlur);
