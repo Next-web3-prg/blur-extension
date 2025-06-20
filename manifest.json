@@ -6,12 +6,16 @@
   "permissions": [
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "runtime"
   ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icon.png"
+      "16": "icons/disabled-16.png",
+      "32": "icons/disabled-32.png",
+      "48": "icons/disabled-48.png",
+      "128": "icons/disabled-128.png"
     }
   },
   "content_scripts": [
@@ -24,5 +28,8 @@
       ],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
 }
