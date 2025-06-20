@@ -1,6 +1,7 @@
 // content.js
 // Blur logic for images, videos, canvases, and divs with background images
 let lastKeyTime = 0;
+const maxBlur = 50; // Maximum blur amount
 
 // Main keydown handler for global blur toggle and blur amount adjustment
 // Alt+L: toggle blur, Alt+[ / Alt+]: decrease/increase blur
@@ -15,8 +16,7 @@ document.addEventListener("keydown", (e) => {
     chrome.storage.sync.get(["enabled", "blur"], ({ enabled, blur }) => {
       const newState = !enabled;
       chrome.storage.sync.set({ enabled: newState });
-      const blurAmount = (blur / 10).toFixed(1);
-      setBlurAll(newState, blurAmount);
+      setBlurAll(newState, blur);
     });
   }
 
@@ -24,11 +24,10 @@ document.addEventListener("keydown", (e) => {
   if (e.altKey && (e.key === "[" || e.key === "]")) {
     chrome.storage.sync.get(["enabled", "blur"], ({ enabled, blur }) => {
       let newBlur = blur;
-      if (e.key === "]" && blur < 100) newBlur += 10;
-      if (e.key === "[" && blur > 0) newBlur -= 10;
+      if (e.key === "]" && blur < 100) newBlur += Math.ceil(newBlur / 5);
+      if (e.key === "[" && blur > 0) newBlur -= Math.ceil(newBlur / 5);
       chrome.storage.sync.set({ blur: newBlur });
-      const blurAmount = (newBlur / 10).toFixed(1);
-      setBlurAll(enabled, blurAmount);
+      setBlurAll(enabled, newBlur);
     });
   }
 });
@@ -36,12 +35,12 @@ document.addEventListener("keydown", (e) => {
 // Blur/unblur all supported elements
 function setBlurAll(enabled, amount) {
   document.querySelectorAll("img, video, canvas").forEach((el) => {
-    el.style.filter = enabled ? `blur(${amount}px)` : "";
+    el.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
   });
-  document.querySelectorAll("div").forEach((div) => {
+  document.querySelectorAll("div, span").forEach((div) => {
     const bg = window.getComputedStyle(div).backgroundImage;
     if (bg && bg !== "none") {
-      div.style.filter = enabled ? `blur(${amount}px)` : "";
+      div.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
     } else if (!enabled) {
       div.style.filter = "";
     }
@@ -51,8 +50,7 @@ function setBlurAll(enabled, amount) {
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.action === "applyBlur") {
-    const blurAmount = (msg.blur / 10).toFixed(1);
-    setBlurAll(msg.enabled, blurAmount);
+    setBlurAll(msg.enabled, msg.blur);
   }
 });
 
@@ -60,8 +58,7 @@ chrome.runtime.onMessage.addListener((msg) => {
 chrome.storage.sync.get(
   ["enabled", "blur"],
   ({ enabled = false, blur = 0 }) => {
-    const blurAmount = (blur / 10).toFixed(1);
-    setBlurAll(enabled, blurAmount);
+    setBlurAll(enabled, blur);
   }
 );
 
@@ -70,8 +67,7 @@ const observer = new MutationObserver(() => {
   chrome.storage.sync.get(
     ["enabled", "blur"],
     ({ enabled = false, blur = 0 }) => {
-      const blurAmount = (blur / 10).toFixed(1);
-      setBlurAll(enabled, blurAmount);
+      setBlurAll(enabled, blur);
     }
   );
 });
