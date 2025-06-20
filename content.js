@@ -12,7 +12,7 @@ document.addEventListener("keydown", (e) => {
   lastKeyTime = now;
 
   // Global blur toggle
-  if (e.altKey && e.key.toLowerCase() === "l") {
+  if (e.altKey && (e.key === 0x4C || e.key === 0x6C)) {
     chrome.storage.sync.get(["enabled", "blur"], ({ enabled, blur }) => {
       const newState = !enabled;
       chrome.storage.sync.set({ enabled: newState });
@@ -24,9 +24,21 @@ document.addEventListener("keydown", (e) => {
   if (e.altKey && (e.key === "[" || e.key === "]")) {
     chrome.storage.sync.get(["enabled", "blur"], ({ enabled, blur }) => {
       let newBlur = blur;
-      if (e.key === "]" && blur < 100)
-        newBlur += Math.max(Math.ceil(newBlur / 5), 1);
-      if (e.key === "[" && blur > 0) newBlur -= Math.ceil(newBlur / 5);
+      if (e.key === "]" && blur < 100){
+        if (newBlur === 0) newBlur = 1; // Start from 1 if currently 0
+        if (newBlur >= 100) return; // Don't exceed max blur
+        if (newBlur < 5) newBlur += 1; // Avoid too small increments
+        else if (newBlur < 20) newBlur += Math.ceil(newBlur / 10);
+        else if (newBlur < 50) newBlur += Math.ceil(newBlur / 5);
+        else if (newBlur < 100) newBlur += Math.ceil(newBlur / 2);
+      }
+      if (e.key === "[" && blur > 1){
+        if (newBlur <= 1) return; // Don't go below 1
+        if (newBlur <= 5) newBlur -= 1; // Avoid too small decrements
+        else if (newBlur <= 20) newBlur -= Math.ceil(newBlur / 10);
+        else if (newBlur <= 50) newBlur -= Math.ceil(newBlur / 5);
+        else if (newBlur <= 100) newBlur -= Math.ceil(newBlur / 2);
+      }
       chrome.storage.sync.set({ blur: newBlur });
       setBlurAll(enabled, newBlur);
     });
