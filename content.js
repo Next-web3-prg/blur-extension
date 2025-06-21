@@ -59,6 +59,7 @@ function setBlurAll(enabled, amount) {
       document.querySelectorAll("img").forEach((el) => {
         el.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
       });
+      blurImagesInTables(enabled, amount); // Blur images in tables only
       if (enableVideo && enabled) {
         document.querySelectorAll("video").forEach((el) => {
           el.style.filter = enabled
@@ -103,6 +104,12 @@ function setBlurAll(enabled, amount) {
       });
     }
   );
+}
+
+function blurImagesInTables(enabled, amount) {
+  document.querySelectorAll("table td img").forEach((el) => {
+    el.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
+  });
 }
 
 // Listen for messages from the background script
