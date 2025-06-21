@@ -136,24 +136,6 @@ function debouncedBlurUpdate() {
     );
   }, 100); // 100ms debounce
 }
-// const observer = new MutationObserver(debouncedBlurUpdate);
-// observer.observe(document.body, {
-//   childList: true,
-//   subtree: true,
-//   attributes: true,
-// });
-// Observe DOM changes and re-apply blur for SPA and dynamic content
-// const observer = new MutationObserver(() => {
-//   chrome.storage.sync.get(
-//     ["enabled", "blur", "whitelist"],
-//     ({ enabled = false, blur = 0, whitelist = [] }) => {
-//       let host = '';
-//       try { host = window.location.hostname; } catch (e) { }
-//       const isWhitelisted = Array.isArray(whitelist) && (whitelist.includes(host) || whitelist.some(site => host.endsWith('.' + site)));
-//       setBlurAll(enabled && !isWhitelisted, blur);
-//     }
-//   );
-// });
 
 let observer = null;
 function setupObserver() {
