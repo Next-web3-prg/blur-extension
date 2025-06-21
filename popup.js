@@ -30,20 +30,20 @@ function sendUpdate(forceEnabled) {
 
 // Initialize popup state
 chrome.storage.sync.get(
-  ["enabled", "blur", "blurVideo", "blurCanvas", "blurBgImage"],
+  ["enabled", "blur", "enableVideo", "enableCanvas", "enableBgImage"],
   ({
     enabled = false,
     blur = 0,
-    blurVideo = true,
-    blurCanvas = true,
-    blurBgImage = true,
+    enableVideo = true,
+    enableCanvas = true,
+    enableBgImage = true,
   }) => {
     toggle.checked = enabled;
     range.value = blur;
     blurValue.textContent = `${blur}%`;
-    toggleVideo.checked = blurVideo;
-    toggleCanvas.checked = blurCanvas;
-    toggleBgImage.checked = blurBgImage;
+    toggleVideo.checked = enableVideo;
+    toggleCanvas.checked = enableCanvas;
+    toggleBgImage.checked = enableBgImage;
   }
 );
 
@@ -84,19 +84,19 @@ range.addEventListener("input", () => {
 
 toggleVideo.addEventListener("change", () => {
   chrome.storage.sync.set(
-    { enabled: toggle.checked, blurVideo: toggleVideo.checked },
+    { enabled: toggle.checked, enableVideo: toggleVideo.checked },
     sendUpdate
   );
 });
 toggleCanvas.addEventListener("change", () => {
   chrome.storage.sync.set(
-    { enabled: toggle.checked, blurCanvas: toggleCanvas.checked },
+    { enabled: toggle.checked, enableCanvas: toggleCanvas.checked },
     sendUpdate
   );
 });
 toggleBgImage.addEventListener("change", () => {
   chrome.storage.sync.set(
-    { enabled: toggle.checked, blurBgImage: toggleBgImage.checked },
+    { enabled: toggle.checked, enableBgImage: toggleBgImage.checked },
     sendUpdate
   );
 });

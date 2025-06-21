@@ -1,20 +1,5 @@
-// content.js
-// Blur logic for images, videos, canvases, and divs with background images
 let lastKeyTime = 0;
 const maxBlur = 50; // Maximum blur amount
-
-// Main keydown handler for global blur toggle and blur amount adjustment
-// Alt+L: toggle blur, Alt+[ / Alt+]: decrease/increase blur
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Set initial icon based on storage state
-  chrome.storage.sync.get(["enabled", "blur"], ({ enabled, blur }) => {
-    chrome.runtime.sendMessage({
-      action: "setIcon",
-      enabled: enabled,
-    });
-  });
-});
 
 document.addEventListener("keydown", (e) => {
   const now = Date.now();
@@ -62,13 +47,19 @@ document.addEventListener("keydown", (e) => {
 
 // Blur/unblur all supported elements
 function setBlurAll(enabled, amount) {
+  if (amount < 1) {
+    amount = 1; // Ensure blur amount is non-negative
+  }
+  else if (amount > 100) {
+    amount = 100; // Cap blur amount at 100%
+  }
   chrome.storage.sync.get(
-    ["blurVideo", "blurCanvas", "blurBgImage"],
-    ({ blurVideo = true, blurCanvas = true, blurBgImage = true }) => {
+    ["enableVideo", "enableCanvas", "enableBgImage"],
+    ({ enableVideo = true, enableCanvas = true, enableBgImage = true }) => {
       document.querySelectorAll("img").forEach((el) => {
         el.style.filter = enabled ? `blur(${(amount * maxBlur) / 100}px)` : "";
       });
-      if (blurVideo && enabled) {
+      if (enableVideo && enabled) {
         document.querySelectorAll("video").forEach((el) => {
           el.style.filter = enabled
             ? `blur(${(amount * maxBlur) / 100}px)`
@@ -79,7 +70,7 @@ function setBlurAll(enabled, amount) {
           el.style.filter = "";
         });
       }
-      if (blurCanvas && enabled) {
+      if (enableCanvas && enabled) {
         document.querySelectorAll("canvas, svg").forEach((el) => {
           el.style.filter = enabled
             ? `blur(${(amount * maxBlur) / 100}px)`
@@ -90,7 +81,7 @@ function setBlurAll(enabled, amount) {
           el.style.filter = "";
         });
       }
-      if (blurBgImage) {
+      if (enableBgImage) {
         document.querySelectorAll("div, span").forEach((el) => {
           const bg = window.getComputedStyle(el).backgroundImage;
           if (bg && bg.startsWith("url(")) {
@@ -129,20 +120,84 @@ chrome.storage.sync.get(
   }
 );
 
+var debounceTimer = null;
+function debouncedBlurUpdate() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(function () {
+    chrome.storage.sync.get(
+      ["enabled", "blur", "whitelist"],
+      function ({ enabled = false, blur = 0, whitelist = [] }) {
+        var host = '';
+        try { host = window.location.hostname; } catch (e) { }
+        const isWhitelisted = Array.isArray(whitelist) &&
+          (whitelist.includes(host) || whitelist.some(site => host.endsWith('.' + site)));
+        setBlurAll(enabled && !isWhitelisted, blur);
+      }
+    );
+  }, 100); // 100ms debounce
+}
+// const observer = new MutationObserver(debouncedBlurUpdate);
+// observer.observe(document.body, {
+//   childList: true,
+//   subtree: true,
+//   attributes: true,
+// });
 // Observe DOM changes and re-apply blur for SPA and dynamic content
-const observer = new MutationObserver(() => {
-  chrome.storage.sync.get(
-    ["enabled", "blur", "whitelist"],
-    ({ enabled = false, blur = 0, whitelist = [] }) => {
-      let host = '';
-      try { host = window.location.hostname; } catch (e) {}
-      const isWhitelisted = Array.isArray(whitelist) && (whitelist.includes(host) || whitelist.some(site => host.endsWith('.' + site)));
-      setBlurAll(enabled && !isWhitelisted, blur);
-    }
-  );
+// const observer = new MutationObserver(() => {
+//   chrome.storage.sync.get(
+//     ["enabled", "blur", "whitelist"],
+//     ({ enabled = false, blur = 0, whitelist = [] }) => {
+//       let host = '';
+//       try { host = window.location.hostname; } catch (e) { }
+//       const isWhitelisted = Array.isArray(whitelist) && (whitelist.includes(host) || whitelist.some(site => host.endsWith('.' + site)));
+//       setBlurAll(enabled && !isWhitelisted, blur);
+//     }
+//   );
+// });
+
+let observer = null;
+function setupObserver() {
+  if (!document.body) {
+    setTimeout(setupObserver, 50);
+    return;
+  }
+  if (window.__blurObserverAttached) return;
+  window.__blurObserverAttached = true;
+  observer = new MutationObserver(debouncedBlurUpdate);
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+  });
+}
+// --- Initial setup ---
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", setupObserver);
+} else {
+  setupObserver();
+}
+
+// --- Optional: Clean up observer and timer on unload ---
+window.addEventListener("unload", () => {
+  clearTimeout(debounceTimer);
+  if (observer) observer.disconnect();
 });
-observer.observe(document.body, {
-  childList: true,
-  subtree: true,
-  attributes: true,
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Set initial icon based on storage state
+  chrome.storage.sync.get(["enabled", "blur", "enableBgImage", "enableCanvas", "enableVideo", "whiteSiteList"], ({ enabled = true, blur, enableBgImage, enableCanvas, enableVideo, whiteSiteList = [] }) => {
+    chrome.runtime.sendMessage({
+      action: "setIcon",
+      enabled: enabled,
+    });
+    setBlurAll(enabled, blur);
+  });
 });
+
+chrome.storage.onChanged.addEventListener(({ enabled = true, blur = 1, enableBgImage = true, enableCanvas = true, enableVideo = true, whiteSiteList = [] }) => {
+  chrome.runtime.sendMessage({
+    action: "setIcon",
+    enabled: enabled.newValue,
+  });
+  setBlurAll(enabled.newValue, blur.newValue);
+})
