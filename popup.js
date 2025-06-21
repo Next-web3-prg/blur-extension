@@ -15,7 +15,7 @@ function sendUpdate(forceEnabled) {
       let host = '';
       try {
         host = new URL(tabs[0].url).hostname;
-      } catch (e) {}
+      } catch (e) { }
       const whitelist = Array.isArray(data.whitelist) ? data.whitelist : [];
       const isWhitelisted = whitelist.includes(host) || whitelist.some(site => host.endsWith('.' + site));
       const shouldBlur = typeof forceEnabled === 'boolean' ? forceEnabled : (data.enabled && !isWhitelisted);
@@ -122,6 +122,9 @@ addRemoveBtn.style.marginTop = "4px";
 whitelistSection.appendChild(addRemoveBtn);
 
 document.body.appendChild(whitelistSection);
+
+document.body.appendChild(document.createElement("hr"));
+document.body.appendChild(document.createElement("p").textContent = "June, 2025");
 
 function renderWhitelistBox(currentHost) {
   chrome.storage.sync.get(["whitelist"], ({ whitelist = [] }) => {
