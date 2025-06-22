@@ -155,6 +155,12 @@ function setupObserver() {
 // --- Initial setup ---
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", setupObserver);
+  chrome.storage.sync.get(["enabled"], ({ enabled = false }) => {
+    chrome.runtime.sendMessage({
+      action: "setIcon",
+      enabled: enabled,
+    });
+  });
 } else {
   setupObserver();
 }
