@@ -6,6 +6,8 @@ const blurValue = document.getElementById("blurValue");
 const toggleVideo = document.getElementById("toggleVideo");
 const toggleCanvas = document.getElementById("toggleCanvas");
 const toggleBgImage = document.getElementById("toggleBgImage");
+const whitelistList = document.getElementById("whitelistList");
+const addRemoveBtn = document.getElementById("addRemoveBtn");
 
 function sendUpdate(forceEnabled) {
   chrome.storage.sync.get(["enabled", "blur", "whitelist"], (data) => {
@@ -101,60 +103,30 @@ toggleBgImage.addEventListener("change", () => {
   );
 });
 
-// --- Whitelist UI ---
-const whitelistSection = document.createElement("div");
-whitelistSection.style.margin = "10px 0";
-const whitelistLabel = document.createElement("div");
-whitelistLabel.textContent = "Whitelist:";
-whitelistLabel.style.fontWeight = "bold";
-whitelistSection.appendChild(whitelistLabel);
-
-const whitelistList = document.createElement("div");
-whitelistList.id = "whitelistList";
-whitelistList.style.width = "100%";
-whitelistList.style.minHeight = "60px";
-whitelistList.style.border = "1px solid #ccc";
-whitelistList.style.padding = "4px";
-whitelistList.style.fontSize = "12px";
-whitelistList.style.overflow = "hidden";
-whitelistSection.appendChild(whitelistList);
-
-const addRemoveBtn = document.createElement("button");
-addRemoveBtn.textContent = "Add/Remove Current Site";
-addRemoveBtn.style.width = "100%";
-addRemoveBtn.style.marginTop = "4px";
-whitelistSection.appendChild(addRemoveBtn);
-
-document.body.appendChild(whitelistSection);
-
-document.body.appendChild(document.createElement("hr"));
-document.body.appendChild(document.createElement("p").textContent = "June, 2025");
-
 function renderWhitelistBox(currentHost) {
   chrome.storage.sync.get(["whitelist"], ({ whitelist = [] }) => {
     const list = Array.isArray(whitelist) ? whitelist : [];
     whitelistList.innerHTML = "";
+    
     if (list.length === 0) {
-      whitelistList.textContent = "No sites in whitelist";
-      whitelistList.style.color = "#999";
-      whitelistList.style.fontStyle = "italic";
+      const emptyDiv = document.createElement("div");
+      emptyDiv.className = "whitelist-empty";
+      emptyDiv.textContent = "No sites in whitelist";
+      whitelistList.appendChild(emptyDiv);
     } else {
       list.forEach((site) => {
         const siteDiv = document.createElement("div");
+        siteDiv.className = "whitelist-item";
         siteDiv.textContent = site;
-        siteDiv.style.padding = "2px 0";
-        siteDiv.style.borderBottom = "1px solid #eee";
         whitelistList.appendChild(siteDiv);
       });
-      // Remove border from last item
-      if (whitelistList.lastChild) {
-        whitelistList.lastChild.style.borderBottom = "none";
-      }
     }
+    
     // Update button text
     if (currentHost) {
       const inList = list.includes(currentHost) || list.some(site => currentHost.endsWith('.' + site));
       addRemoveBtn.textContent = inList ? "Remove Current Site" : "Add Current Site";
+      addRemoveBtn.className = inList ? "whitelist-btn remove" : "whitelist-btn add";
     }
   });
 }
