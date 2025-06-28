@@ -2,31 +2,265 @@
 <html>
 <head>
   <style>
-    body { font-family: sans-serif; width: 200px; padding: 10px; }
-    input[type=range] { width: 100%; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      width: 280px; 
+      padding: 16px; 
+      margin: 0;
+      background: #f8f9fa;
+      color: #333;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .section {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    
+    .section-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: #495057;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      background: #007bff;
+      border-radius: 2px;
+      margin-right: 8px;
+    }
+    
+    label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    
+    label:hover {
+      color: #007bff;
+    }
+    
+    input[type=checkbox] {
+      margin-right: 8px;
+      transform: scale(1.1);
+    }
+    
+    input[type=range] { 
+      width: 100%; 
+      margin: 8px 0;
+      height: 4px;
+      border-radius: 2px;
+      background: #e9ecef;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #007bff;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    input[type=range]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #007bff;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .blur-value {
+      font-weight: 600;
+      color: #007bff;
+      font-size: 12px;
+      text-align: center;
+      background: #e3f2fd;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-top: 4px;
+    }
+    
+    /* Whitelist specific styles */
+    .whitelist-container {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 8px;
+    }
+    
+    .whitelist-list {
+      max-height: 80px;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 8px;
+      font-size: 11px;
+      margin-bottom: 8px;
+    }
+    
+    .whitelist-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    
+    .whitelist-list::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 2px;
+    }
+    
+    .whitelist-list::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 2px;
+    }
+    
+    .whitelist-item {
+      padding: 4px 6px;
+      margin-bottom: 2px;
+      background: #f8f9fa;
+      border-radius: 3px;
+      border-left: 3px solid #28a745;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 10px;
+      color: #495057;
+    }
+    
+    .whitelist-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .whitelist-empty {
+      color: #6c757d;
+      font-style: italic;
+      text-align: center;
+      padding: 12px;
+    }
+    
+    .whitelist-btn {
+      width: 100%;
+      padding: 8px 12px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .whitelist-btn:hover {
+      background: #0056b3;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .whitelist-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    .whitelist-btn:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .whitelist-btn.remove {
+      background: #dc3545;
+    }
+    
+    .whitelist-btn.remove:hover {
+      background: #c82333;
+    }
+    
+    .whitelist-btn.add {
+      background: #28a745;
+    }
+    
+    .whitelist-btn.add:hover {
+      background: #218838;
+    }
+    
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      color: #6c757d;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #e9ecef;
+    }
   </style>
 </head>
 <body>
-  <label>
-    <input type="checkbox" id="toggleBlur" /> Enable Blur
-  </label>
-  <br><br>
-  <label>
-    Blur Amount: <span id="blurValue">0%</span>
-    <input type="range" id="blurRange" min="0" max="100" value="0">
-  </label>
-  <br>
-  <label>
-    <input type="checkbox" id="toggleVideo" /> Blur Video
-  </label>
-  <br>
-  <label>
-    <input type="checkbox" id="toggleCanvas" /> Blur Canvas/SVG
-  </label>
-  <br>
-  <label>
-    <input type="checkbox" id="toggleBgImage" /> Blur Background Images
-  </label>
+  <div class="container">
+    <div class="section">
+      <div class="section-title">Blur Settings</div>
+      <label>
+        <input type="checkbox" id="toggleBlur" /> Enable Blur
+      </label>
+      <div>
+        <label>Blur Amount: <span id="blurValue" class="blur-value">0%</span></label>
+        <input type="range" id="blurRange" min="0" max="100" value="0">
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Content Types</div>
+      <label>
+        <input type="checkbox" id="toggleVideo" /> Blur Video
+      </label>
+      <label>
+        <input type="checkbox" id="toggleCanvas" /> Blur Canvas/SVG
+      </label>
+      <label>
+        <input type="checkbox" id="toggleBgImage" /> Blur Background Images
+      </label>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Whitelist</div>
+      <div class="whitelist-container">
+        <div id="whitelistList" class="whitelist-list">
+          <div class="whitelist-empty">No sites in whitelist</div>
+        </div>
+        <button id="addRemoveBtn" class="whitelist-btn">Add Current Site</button>
+      </div>
+    </div>
+    
+    <div class="footer">
+      June, 2025
+    </div>
+  </div>
   
   <script src="popup.js"></script>
 </body>
