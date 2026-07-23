@@ -1,267 +1,618 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <style>
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-      width: 280px; 
-      padding: 16px; 
+    :root {
+      --bg: #f4f6f9;
+      --surface: #fff;
+      --ink: #1a2332;
+      --muted: #6b7789;
+      --line: #e5e9f0;
+      --accent: #3b82f6;
+      --accent-soft: #ebf3ff;
+      --accent-deep: #2563eb;
+      --ok: #0f9f6e;
+      --danger: #e11d48;
+      --danger-soft: #fff1f3;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      width: 300px;
       margin: 0;
-      background: #f8f9fa;
-      color: #333;
+      padding: 10px;
+      font-family: "Segoe UI", "Helvetica Neue", ui-sans-serif, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
     }
-    
-    .container {
-      background: white;
-      border-radius: 8px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
     }
-    
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: #0b1220;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .brand-mark img {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+
+    .brand-copy { flex: 1; min-width: 0; }
+
+    .brand-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .brand-sub {
+      font-size: 10px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-pill {
+      flex-shrink: 0;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: #eef1f5;
+      color: var(--muted);
+    }
+
+    body.is-on .status-pill {
+      background: var(--accent-soft);
+      color: var(--accent-deep);
+    }
+
     .section {
-      margin-bottom: 16px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid #e9ecef;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
     }
-    
-    .section:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
+
+    .section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
     }
-    
-    .section-title {
-      font-weight: 600;
-      font-size: 14px;
-      color: #495057;
-      margin-bottom: 8px;
+
+    .master-row {
       display: flex;
       align-items: center;
-    }
-    
-    .section-title::before {
-      content: '';
-      width: 4px;
-      height: 16px;
-      background: #007bff;
-      border-radius: 2px;
-      margin-right: 8px;
-    }
-    
-    label {
-      display: flex;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 13px;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 9px;
+      border-radius: 8px;
+      background: var(--bg);
+      border: 1px solid var(--line);
       cursor: pointer;
-      transition: color 0.2s;
     }
-    
-    label:hover {
-      color: #007bff;
+
+    body.is-on .master-row {
+      background: var(--accent-soft);
+      border-color: #c7dbff;
     }
-    
-    input[type=checkbox] {
-      margin-right: 8px;
-      transform: scale(1.1);
+
+    .master-title { font-size: 12px; font-weight: 600; }
+
+    .master-hint {
+      display: block;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 1px;
     }
-    
-    input[type=range] { 
-      width: 100%; 
-      margin: 8px 0;
-      height: 4px;
-      border-radius: 2px;
-      background: #e9ecef;
-      outline: none;
-      -webkit-appearance: none;
+
+    .switch {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
     }
-    
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .switch-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: #c5cedb;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .switch-track::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      background: #007bff;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: transform 0.15s;
     }
-    
-    input[type=range]::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #007bff;
-      cursor: pointer;
-      border: none;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    
-    .blur-value {
-      font-weight: 600;
-      color: #007bff;
-      font-size: 12px;
-      text-align: center;
-      background: #e3f2fd;
-      padding: 4px 8px;
-      border-radius: 4px;
-      margin-top: 4px;
-    }
-    
-    /* Whitelist specific styles */
-    .whitelist-container {
-      background: #f8f9fa;
-      border: 1px solid #dee2e6;
-      border-radius: 6px;
-      padding: 12px;
+
+    .switch input:checked + .switch-track { background: var(--accent); }
+    .switch input:checked + .switch-track::after { transform: translateX(16px); }
+
+    .intensity {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       margin-top: 8px;
     }
-    
-    .whitelist-list {
-      max-height: 80px;
-      overflow-y: auto;
-      background: white;
-      border: 1px solid #dee2e6;
-      border-radius: 4px;
-      padding: 8px;
+
+    .intensity-label {
       font-size: 11px;
-      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--muted);
+      flex-shrink: 0;
     }
-    
-    .whitelist-list::-webkit-scrollbar {
-      width: 4px;
-    }
-    
-    .whitelist-list::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 2px;
-    }
-    
-    .whitelist-list::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
-      border-radius: 2px;
-    }
-    
-    .whitelist-item {
-      padding: 4px 6px;
-      margin-bottom: 2px;
-      background: #f8f9fa;
-      border-radius: 3px;
-      border-left: 3px solid #28a745;
-      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-      font-size: 10px;
-      color: #495057;
-    }
-    
-    .whitelist-item:last-child {
-      margin-bottom: 0;
-    }
-    
-    .whitelist-empty {
-      color: #6c757d;
-      font-style: italic;
+
+    .amount-value {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      background: var(--accent-soft);
+      padding: 2px 6px;
+      border-radius: 999px;
+      min-width: 38px;
       text-align: center;
-      padding: 12px;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
     }
-    
-    .whitelist-btn {
+
+    .slider-wrap { flex: 1; min-width: 0; }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
       width: 100%;
-      padding: 8px 12px;
-      background: #007bff;
-      color: white;
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(
+        90deg,
+        var(--accent) 0%,
+        var(--accent) var(--fill, 0%),
+        #e6ebf2 var(--fill, 0%),
+        #e6ebf2 100%
+      );
+      outline: none;
+      cursor: pointer;
+      margin: 0;
+      vertical-align: middle;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid var(--accent);
+      box-shadow: 0 1px 2px rgba(37, 99, 235, 0.25);
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid var(--accent);
+      cursor: pointer;
+    }
+
+    .more-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0;
       border: none;
-      border-radius: 4px;
+      background: transparent;
+      font-family: inherit;
+      cursor: pointer;
+      color: var(--ink);
+    }
+
+    .more-toggle-label {
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .more-toggle-hint {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .chevron {
+      width: 16px;
+      height: 16px;
+      color: var(--muted);
+      transition: transform 0.15s;
+      flex-shrink: 0;
+    }
+
+    .more-toggle[aria-expanded="true"] .chevron {
+      transform: rotate(180deg);
+    }
+
+    .more-panel {
+      display: none;
+      margin-top: 6px;
+      padding-top: 4px;
+      border-top: 1px solid var(--line);
+      max-height: 280px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+
+    .more-panel.is-open { display: block; }
+
+    .option-list { display: flex; flex-direction: column; gap: 2px; }
+
+    .option-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 5px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .option-row:hover { background: #f7f9fc; }
+
+    .option-meta { min-width: 0; }
+
+    .option-title {
       font-size: 12px;
       font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
+      display: block;
     }
-    
-    .whitelist-btn:hover {
-      background: #0056b3;
-      transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    
-    .whitelist-btn:active {
-      transform: translateY(0);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    }
-    
-    .whitelist-btn:disabled {
-      background: #6c757d;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    .whitelist-btn.remove {
-      background: #dc3545;
-    }
-    
-    .whitelist-btn.remove:hover {
-      background: #c82333;
-    }
-    
-    .whitelist-btn.add {
-      background: #28a745;
-    }
-    
-    .whitelist-btn.add:hover {
-      background: #218838;
-    }
-    
-    .footer {
-      text-align: center;
+
+    .option-desc {
       font-size: 10px;
-      color: #6c757d;
-      margin-top: 16px;
-      padding-top: 12px;
-      border-top: 1px solid #e9ecef;
+      color: var(--muted);
+      display: block;
+      margin-top: 1px;
+    }
+
+    .coverage-block {
+      margin-top: 8px;
+      padding: 8px;
+      border-radius: 8px;
+      background: #f7f9fc;
+      border: 1px solid var(--line);
+    }
+
+    .coverage-label {
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .coverage-seg {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .coverage-seg button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 6px 4px;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      line-height: 1.2;
+      transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    }
+
+    .coverage-seg button:hover {
+      border-color: #c7dbff;
+      color: var(--accent-deep);
+    }
+
+    .coverage-seg button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    .coverage-seg button.is-active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .coverage-hint {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    .site-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .site-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .site-row.is-exempt .site-dot { background: var(--ok); }
+
+    .site-row strong {
+      color: var(--ink);
+      font-weight: 600;
+      font-family: ui-monospace, "Cascadia Mono", monospace;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .exceptions-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .whitelist-btn {
+      width: 100%;
+      border: none;
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .whitelist-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .whitelist-btn.add {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .whitelist-btn.add:hover:not(:disabled) { background: var(--accent-deep); }
+
+    .whitelist-btn.remove {
+      background: var(--danger-soft);
+      color: var(--danger);
+      border: 1px solid #ffd4dc;
+    }
+
+    .whitelist-btn.remove:hover:not(:disabled) { background: #ffe4e9; }
+
+    .link-btn {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #fafbfd;
+      color: var(--accent-deep);
+    }
+
+    .link-btn:hover { background: var(--accent-soft); }
+
+    .footer {
+      padding: 6px 10px 7px;
+      background: #fafbfd;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    .shortcut {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 9px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    kbd {
+      font-family: inherit;
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-bottom-width: 2px;
+      border-radius: 3px;
+      padding: 0 3px;
+      line-height: 1.35;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="section">
-      <div class="section-title">Blur Settings</div>
-      <label>
-        <input type="checkbox" id="toggleBlur" /> Enable Blur
-      </label>
-      <div>
-        <label>Blur Amount: <span id="blurValue" class="blur-value">0%</span></label>
-        <input type="range" id="blurRange" min="0" max="100" value="0">
+  <div class="panel">
+    <header class="header">
+      <div class="brand-mark" aria-hidden="true">
+        <img src="icons/enabled-32.png" alt="" />
       </div>
-    </div>
-    
-    <div class="section">
-      <div class="section-title">Content Types</div>
-      <label>
-        <input type="checkbox" id="toggleVideo" /> Blur Video
+      <div class="brand-copy">
+        <div class="brand-title">Image Blur Toggle</div>
+        <div class="brand-sub" id="headerHost">Checking site…</div>
+      </div>
+      <div class="status-pill" id="statusPill">Off</div>
+    </header>
+
+    <section class="section">
+      <label class="master-row" for="toggleBlur">
+        <span>
+          <span class="master-title">Enable blur</span>
+          <span class="master-hint" id="masterHint">Off on all sites</span>
+        </span>
+        <span class="switch">
+          <input type="checkbox" id="toggleBlur" />
+          <span class="switch-track"></span>
+        </span>
       </label>
-      <label>
-        <input type="checkbox" id="toggleCanvas" /> Blur Canvas/SVG
-      </label>
-      <label>
-        <input type="checkbox" id="toggleBgImage" /> Blur Background Images
-      </label>
-    </div>
-    
-    <div class="section">
-      <div class="section-title">Whitelist</div>
-      <div class="whitelist-container">
-        <div id="whitelistList" class="whitelist-list">
-          <div class="whitelist-empty">No sites in whitelist</div>
+      <div class="intensity">
+        <span class="intensity-label">Intensity</span>
+        <div class="slider-wrap">
+          <input type="range" id="blurRange" min="0" max="100" value="0" aria-label="Blur intensity" />
         </div>
-        <button id="addRemoveBtn" class="whitelist-btn">Add Current Site</button>
+        <span class="amount-value" id="blurValue">0%</span>
       </div>
-    </div>
-    
-    <div class="footer">
-      June, 2025
-    </div>
+    </section>
+
+    <section class="section">
+      <button type="button" class="more-toggle" id="moreToggle" aria-expanded="false" aria-controls="morePanel">
+        <span>
+          <span class="more-toggle-label">More options</span>
+          <span class="more-toggle-hint" id="moreHint">Video, canvas, coverage…</span>
+        </span>
+        <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true">
+          <path fill="currentColor" d="M4.2 6.2a.75.75 0 0 1 1.06 0L8 8.94l2.74-2.74a.75.75 0 1 1 1.06 1.06l-3.27 3.27a.75.75 0 0 1-1.06 0L4.2 7.26a.75.75 0 0 1 0-1.06z"/>
+        </svg>
+      </button>
+      <div class="more-panel" id="morePanel" role="region" hidden>
+        <div class="option-list">
+          <label class="option-row" for="toggleVideo">
+            <span class="option-meta">
+              <span class="option-title">Video</span>
+            </span>
+            <span class="switch">
+              <input type="checkbox" id="toggleVideo" />
+              <span class="switch-track"></span>
+            </span>
+          </label>
+          <label class="option-row" for="toggleCanvas">
+            <span class="option-meta">
+              <span class="option-title">Canvas &amp; SVG</span>
+              <span class="option-desc">Large graphics only; tiny icons stay clear</span>
+            </span>
+            <span class="switch">
+              <input type="checkbox" id="toggleCanvas" />
+              <span class="switch-track"></span>
+            </span>
+          </label>
+          <label class="option-row" for="toggleBgImage">
+            <span class="option-meta">
+              <span class="option-title">Background images</span>
+            </span>
+            <span class="switch">
+              <input type="checkbox" id="toggleBgImage" />
+              <span class="switch-track"></span>
+            </span>
+          </label>
+          <label class="option-row" for="toggleSkipTiny">
+            <span class="option-meta">
+              <span class="option-title">Skip tiny images</span>
+              <span class="option-desc">Icons &amp; small SVGs under 48px stay clear</span>
+            </span>
+            <span class="switch">
+              <input type="checkbox" id="toggleSkipTiny" />
+              <span class="switch-track"></span>
+            </span>
+          </label>
+          <div class="coverage-block">
+            <div class="coverage-label">Site compatibility</div>
+            <div class="coverage-seg" role="group" aria-label="Site compatibility">
+              <button type="button" data-mode="auto" id="coverageAuto" title="Auto: stronger coverage on complex apps">Auto</button>
+              <button type="button" data-mode="balanced" id="coverageBalanced" title="Balanced: lighter on CPU">Balanced</button>
+              <button type="button" data-mode="maximum" id="coverageMaximum" title="Maximum: strongest coverage">Maximum</button>
+            </div>
+            <p class="coverage-hint" id="coverageHint">
+              Auto uses stronger coverage on complex apps like Adobe Firefly.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-label" id="exceptionsLabel">Exceptions</div>
+      <div class="site-row" id="siteChip">
+        <span class="site-dot"></span>
+        <span>Site: <strong id="currentSiteLabel">—</strong></span>
+      </div>
+      <div class="exceptions-actions">
+        <button type="button" id="addRemoveBtn" class="whitelist-btn add">
+          Exempt this site
+        </button>
+        <button type="button" id="manageExceptionsBtn" class="link-btn">
+          Manage all exceptions
+        </button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span class="shortcut"><kbd>Alt</kbd><kbd>L</kbd> Toggle</span>
+      <span class="shortcut"><kbd>Alt</kbd><kbd>[</kbd> Soft</span>
+      <span class="shortcut"><kbd>Alt</kbd><kbd>]</kbd> Strong</span>
+    </footer>
   </div>
-  
+
   <script src="popup.js"></script>
 </body>
 </html>
